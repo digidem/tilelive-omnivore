@@ -10,7 +10,7 @@ var xml = fs.readFileSync(path.join(__dirname, 'template.xml'), 'utf8');
 module.exports = Omnivore;
 
 function Omnivore(uri, callback) {
-  uri = url.parse(uri);
+  if (typeof uri === 'string') uri = url.parse(uri);
   var filepath = path.resolve(uri.pathname);
   var omnivore = this;
 
@@ -26,9 +26,14 @@ function Omnivore(uri, callback) {
       return callback('Only 8 bit TIFFs are supported');
     }
 
+    metadata.rasterFormat = uri.format
     metadata.filepath = filepath;
     var mapnikXml = Omnivore.getXml(metadata);
-    new Bridge({ xml: mapnikXml }, setBridge);
+    new Bridge({
+      xml: mapnikXml,
+      format: uri.format,
+      retina: uri.retina
+    }, setBridge);
   }
 
   function setBridge(err, source) {
@@ -46,7 +51,7 @@ Omnivore.registerProtocols = function(tilelive) {
 
 Omnivore.getXml = function(metadata) {
   metadata = _.clone(metadata);
-  metadata.format = metadata.dstype === 'gdal' ? 'webp' : 'pbf';
+  metadata.format = metadata.dstype === 'gdal' ? metadata.rasterFormat || 'webp' : 'pbf';
   metadata.layers = metadata.layers.map(function(name) {
     return {
       layer: name,
