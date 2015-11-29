@@ -26,6 +26,7 @@ function Omnivore(uri, callback) {
       return callback('Only 8 bit TIFFs are supported');
     }
 
+    metadata.rasterFormat = uri.format
     metadata.filepath = filepath;
     var mapnikXml = Omnivore.getXml(metadata);
     new Bridge({ xml: mapnikXml }, setBridge);
@@ -46,7 +47,7 @@ Omnivore.registerProtocols = function(tilelive) {
 
 Omnivore.getXml = function(metadata) {
   metadata = _.clone(metadata);
-  metadata.format = metadata.dstype === 'gdal' ? 'webp' : 'pbf';
+  metadata.format = metadata.dstype === 'gdal' ? metadata.rasterFormat || 'webp' : 'pbf';
   metadata.layers = metadata.layers.map(function(name) {
     return {
       layer: name,
