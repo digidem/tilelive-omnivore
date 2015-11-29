@@ -10,7 +10,7 @@ var xml = fs.readFileSync(path.join(__dirname, 'template.xml'), 'utf8');
 module.exports = Omnivore;
 
 function Omnivore(uri, callback) {
-  uri = url.parse(uri);
+  if (typeof uri === 'string') uri = url.parse(uri);
   var filepath = path.resolve(uri.pathname);
   var omnivore = this;
 
