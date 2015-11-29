@@ -29,7 +29,11 @@ function Omnivore(uri, callback) {
     metadata.rasterFormat = uri.format
     metadata.filepath = filepath;
     var mapnikXml = Omnivore.getXml(metadata);
-    new Bridge({ xml: mapnikXml }, setBridge);
+    new Bridge({
+      xml: mapnikXml,
+      format: uri.format,
+      retina: uri.retina
+    }, setBridge);
   }
 
   function setBridge(err, source) {
